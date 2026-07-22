@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Campus Portal{% endblock %} | Lost & Found + Grievances</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="{% url 'core:home' %}" class="logo">
+                <span>🏫</span> CampusPortal
+            </a>
+            
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'core:home' %}" class="{% if request.resolver_match.view_name == 'core:home' %}active{% endif %}">Home</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'lostfound:lost_list' %}" class="{% if 'lostfound' in request.path %}active{% endif %}">Lost & Found</a></li>
+                        <li><a href="{% url 'grievance:grievance_list' %}" class="{% if 'grievance' in request.path %}active{% endif %}">Grievance Portal</a></li>
+                        {% if user.role in 'staff,admin' or user.is_superuser %}
+                            <li><a href="{% url 'dashboard:index' %}" class="{% if 'dashboard' in request.path %}active{% endif %}">Dashboard</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </nav>
+            
+            <div class="nav-user">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'notifications:notification_list' %}" class="notifications-indicator" style="margin-right: 1rem; font-size: 1.25rem;">
+                        <span>🔔</span>
+                        {% if unread_notifications_count > 0 %}
+                            <span class="notifications-count">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                    
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">
+                        👤 {{ user.username }} 
+                        <span class="badge badge-{{ user.role }}" style="margin-left: 0.5rem; font-size: 0.65rem;">{{ user.get_role_display }}</span>
+                    </a>
+                    
+                    <form action="{% url 'accounts:logout' %}" method="post" style="display:inline; margin-left: 0.5rem;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-logout" style="padding: 0.4rem 0.8rem;">Logout</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-secondary">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; {% now "Y" %} Campus Lost & Found + Grievance Portal. All rights reserved.</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
