@@ -29,14 +29,24 @@ def test_login_view(client):
     response = client.get(login_url)
     assert response.status_code == 200
     
-    # POST login correct
+    # POST login correct with username
     response = client.post(login_url, {'username': 'testuser', 'password': 'password123'})
+    assert response.status_code == 302
+    
+    # Logout before testing email login
+    client.logout()
+    response = client.post(login_url, {'username': 'testuser@example.com', 'password': 'password123'})
+    assert response.status_code == 200
+
+    user = User.objects.get(username='testuser')
+    user.email = 'testuser@example.com'
+    user.save()
+
+    response = client.post(login_url, {'username': 'testuser@example.com', 'password': 'password123'})
     assert response.status_code == 302
     
     # Logout before testing incorrect login
     client.logout()
-    
-    # POST login incorrect
     response = client.post(login_url, {'username': 'testuser', 'password': 'wrongpassword'})
     assert response.status_code == 200
     assert "correct username and password" in response.content.decode()

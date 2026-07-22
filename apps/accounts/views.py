@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from .forms import UserRegisterForm, UserProfileForm
+from .forms import UserRegisterForm, EmailOrUsernameAuthenticationForm, UserProfileForm
 
 User = get_user_model()
 
@@ -20,6 +20,7 @@ class RegisterView(CreateView):
     
     def form_valid(self, form):
         response = super().form_valid(form)
+        self.object.backend = 'accounts.backends.EmailOrUsernameModelBackend'
         login(self.request, self.object)
         messages.success(self.request, f"Welcome to the Campus Portal, {self.object.username}!")
         return response
@@ -36,8 +37,9 @@ class RegisterSuccessView(TemplateView):
 
 class LoginView(BaseLoginView):
     template_name = 'accounts/login.html'
+    authentication_form = EmailOrUsernameAuthenticationForm
     redirect_authenticated_user = True
-    
+
     def get_success_url(self):
         messages.success(self.request, f"Welcome back, {self.request.user.username}!")
         return reverse_lazy('core:home')
