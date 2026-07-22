@@ -27,7 +27,7 @@
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                        <p style="color: var(--error); font-size: 0.8rem; margin-top: 0.25rem;">{{ field.errors.as_text }}</p>
+                        <p class="error-text">{{ field.errors.as_text }}</p>
                     {% endif %}
                 </div>
             {% endfor %}
