@@ -1,0 +1,39 @@
+import pytest
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+@pytest.mark.django_db
+def test_user_creation_roles():
+    student = User.objects.create_user(username='student1', password='pass', role='student')
+    staff = User.objects.create_user(username='staff1', password='pass', role='staff')
+    admin = User.objects.create_superuser(username='admin1', password='pass', email='a@a.com')
+    admin.role = 'admin'
+    admin.save()
+    
+    assert student.is_student is True
+    assert staff.is_staff_user is True
+    assert admin.is_admin_user is True
+    
+    assert User.objects.students().count() == 1
+    assert User.objects.staff().count() == 1
+    assert User.objects.admins().count() == 1
+
+@pytest.mark.django_db
+def test_login_view(client):
+    user = User.objects.create_user(username='testuser', password='password123', role='student')
+    login_url = reverse('accounts:login')
+    
+    # GET login page
+    response = client.get(login_url)
+    assert response.status_code == 200
+    
+    # POST login correct
+    response = client.post(login_url, {'username': 'testuser', 'password': 'password123'})
+    assert response.status_code == 302
+    
+    # POST login incorrect
+    response = client.post(login_url, {'username': 'testuser', 'password': 'wrongpassword'})
+    assert response.status_code == 200
+    assert "correct username and password" in response.content.decode()
