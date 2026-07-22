@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Lost Items{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 class="text-gradient">Lost Items Registry</h1>
+        <p style="color: var(--text-secondary);">Browse lost item reports or create a new one.</p>
+    </div>
+    <a href="{% url 'lostfound:lost_create' %}" class="btn btn-primary">➕ Report Lost Item</a>
+</div>
+
+<div class="card" style="padding: 1rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center;">
+    <form method="get" style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; width: 100%;">
+        <div style="flex: 1; min-width: 250px;">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by title or description...">
+        </div>
+        <div>
+            <select name="status" style="min-width: 120px;">
+                <option value="open" {% if request.GET.status == 'open' or not request.GET.status %}selected{% endif %}>Open</option>
+                <option value="matched" {% if request.GET.status == 'matched' %}selected{% endif %}>Matched</option>
+                <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Closed</option>
+            </select>
+        </div>
+        <div>
+            <select name="my_reports" style="min-width: 140px;">
+                <option value="false" {% if request.GET.my_reports != 'true' %}selected{% endif %}>All Reports</option>
+                <option value="true" {% if request.GET.my_reports == 'true' %}selected{% endif %}>My Reports Only</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Filter</button>
+        <a href="{% url 'lostfound:lost_list' %}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">Reset</a>
+    </form>
+</div>
+
+{% if lost_items %}
+    <div class="grid">
+        {% for item in lost_items %}
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 250px;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                        <span class="badge badge-student">Lost Item</span>
+                        <span class="badge badge-{{ item.status }}">{{ item.get_status_display }}</span>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem;">{{ item.title }}</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ item.description }}
+                    </p>
+                </div>
+                <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+                    <p style="margin-bottom: 0.25rem;">📍 <strong>Location Lost:</strong> {{ item.location_lost }}</p>
+                    <p style="margin-bottom: 0.25rem;">📅 <strong>Date Lost:</strong> {{ item.date_lost }}</p>
+                    <p style="margin-top: 0.5rem; font-weight: 500; color: var(--text-secondary);">By: {{ item.reporter.username }}</p>
+                    <a href="{% url 'lostfound:lost_detail' item.pk %}" class="btn btn-secondary" style="width: 100%; margin-top: 1rem; justify-content: center;">View Details</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 4rem 2rem; color: var(--text-secondary); width: 100%;">
+        <p style="font-size: 1.2rem; margin-bottom: 1rem;">No lost items found matching the filter criteria.</p>
+        <a href="{% url 'lostfound:lost_create' %}" class="btn btn-primary">Report a Lost Item Now</a>
+    </div>
+{% endif %}
+{% endblock %}
