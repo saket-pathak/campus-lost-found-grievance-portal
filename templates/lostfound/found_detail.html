@@ -1,0 +1,108 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Found Item - {{ found_item.title }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <a href="{% url 'lostfound:found_list' %}" style="color: var(--text-secondary); font-weight: 500;">&larr; Back to Found Items</a>
+</div>
+
+<div class="grid" style="grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start;">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span class="badge badge-staff">{{ found_item.get_category_display }}</span>
+            <span class="badge badge-{{ found_item.status }}">{{ found_item.get_status_display }}</span>
+        </div>
+        
+        <h2 style="font-size: 2rem; margin-bottom: 1rem;">{{ found_item.title }}</h2>
+        <p style="color: var(--text-secondary); white-space: pre-line; margin-bottom: 1.5rem;">{{ found_item.description }}</p>
+        
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem;">
+            <p style="margin-bottom: 0.5rem;">📍 <strong>Location Found:</strong> {{ found_item.location_found }}</p>
+            <p style="margin-bottom: 0.5rem;">📅 <strong>Date Found:</strong> {{ found_item.date_found }}</p>
+            <p>👤 <strong>Found By:</strong> {{ found_item.finder.username }}</p>
+        </div>
+
+        {% if found_item.image %}
+            <div style="border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 1.5rem; max-height: 400px; border: 1px solid var(--border-color);">
+                <img src="{{ found_item.image.url }}" alt="{{ found_item.title }}" style="width: 100%; height: auto; object-fit: contain; background: #000;">
+            </div>
+        {% endif %}
+    </div>
+
+    <div>
+        {% if user == found_item.finder or user.role in 'staff,admin' or user.is_superuser %}
+            <h3 class="text-gradient" style="margin-bottom: 1rem;">Claim Requests</h3>
+            
+            {% if claim_requests %}
+                {% for claim in claim_requests %}
+                    <div class="card" style="margin-bottom: 1rem; padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <h4 style="font-size: 1rem;">By: {{ claim.claimant.username }}</h4>
+                            <span class="badge badge-{{ claim.status }}">{{ claim.get_status_display }}</span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                            <strong>Proof/Description:</strong><br>
+                            {{ claim.proof_description }}
+                        </p>
+                        
+                        {% if claim.status == 'pending' %}
+                            <div style="display: flex; gap: 0.5rem;">
+                                <form action="{% url 'lostfound:claim_action' claim.pk %}" method="post" style="flex: 1;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 0.8rem; padding: 0.4rem 1rem; background-color: var(--success);">Approve</button>
+                                </form>
+                                <form action="{% url 'lostfound:claim_action' claim.pk %}" method="post" style="flex: 1;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="btn btn-secondary" style="width: 100%; font-size: 0.8rem; padding: 0.4rem 1rem; border-color: var(--error); color: var(--error);">Reject</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-secondary);">
+                    <p>No claims submitted for this item yet.</p>
+                </div>
+            {% endif %}
+            
+        {% else %}
+            <h3 class="text-gradient" style="margin-bottom: 1rem;">Claim this Item</h3>
+            
+            {% if found_item.status == 'claimed' %}
+                <div class="card" style="border-color: var(--success-bg); background-color: rgba(16, 185, 129, 0.05); text-align: center; padding: 2rem 1.5rem;">
+                    <p style="color: var(--success); font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">✅ Item Handed Over</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">This found item has already been successfully claimed and returned to its owner.</p>
+                </div>
+            {% elif existing_claim %}
+                <div class="card" style="text-align: center; padding: 2.5rem 1.5rem;">
+                    <p style="font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 500;">Claim Request Status</p>
+                    <div style="margin-bottom: 1rem;">
+                        <span class="badge badge-{{ existing_claim.status }}">{{ existing_claim.get_status_display }}</span>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        {% if existing_claim.status == 'pending' %}
+                            Your claim request is currently pending review by the finder or campus staff.
+                        {% elif existing_claim.status == 'rejected' %}
+                            Your claim request was rejected. If you think this was an error, please file a grievance or contact the finder.
+                        {% endif %}
+                    </p>
+                </div>
+            {% else %}
+                <div class="card" style="padding: 1.5rem;">
+                    <form action="{% url 'lostfound:claim_create' found_item.pk %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_proof_description" style="margin-bottom: 0.5rem; font-size: 0.9rem;">Provide description or proof of ownership:</label>
+                            <textarea id="id_proof_description" name="proof_description" rows="4" required placeholder="Describe any unique markings, when/where you lost it, or other proof..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Claim Request</button>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
