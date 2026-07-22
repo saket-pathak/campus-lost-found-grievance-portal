@@ -11,8 +11,9 @@
 {% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 2rem;">
+<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; align-items: center;">
     <a href="{% url 'lostfound:lost_list' %}" style="color: var(--text-secondary); font-weight: 500;">&larr; Back to Lost Items</a>
+    <a href="{% url 'lostfound:found_create' %}" class="btn btn-secondary">🧭 Report Found Item</a>
 </div>
 
 <div class="grid" style="grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start;">
@@ -28,6 +29,8 @@
         <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem;">
             <p style="margin-bottom: 0.5rem;">📍 <strong>Location Lost:</strong> {{ lost_item.location_lost }}</p>
             <p style="margin-bottom: 0.5rem;">📅 <strong>Date Lost:</strong> {{ lost_item.date_lost }}</p>
+            <p style="margin-bottom: 0.5rem;">📧 <strong>Contact Email:</strong> {{ lost_item.contact_email|default:'Not provided' }}</p>
+            <p style="margin-bottom: 0.5rem;">📱 <strong>Contact Number:</strong> {{ lost_item.contact_number|default:'Not provided' }}</p>
             <p>👤 <strong>Reported By:</strong> {{ lost_item.reporter.username }} ({{ lost_item.reporter.email }})</p>
         </div>
 

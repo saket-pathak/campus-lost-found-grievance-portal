@@ -16,7 +16,10 @@
         <h1>Lost Items Registry</h1>
         <p style="color: var(--text-secondary);">Browse lost item reports or create a new one.</p>
     </div>
-    <a href="{% url 'lostfound:lost_create' %}" class="btn btn-primary">➕ Report Lost Item</a>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        <a href="{% url 'lostfound:found_create' %}" class="btn btn-secondary">🧭 Report Found Item</a>
+        <a href="{% url 'lostfound:lost_create' %}" class="btn btn-primary">➕ Report Lost Item</a>
+    </div>
 </div>
 
 <div class="card" style="padding: 1rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center;">
@@ -26,9 +29,9 @@
         </div>
         <div>
             <select name="status" style="min-width: 120px;">
-                <option value="open" {% if request.GET.status == 'open' or not request.GET.status %}selected{% endif %}>Open</option>
-                <option value="matched" {% if request.GET.status == 'matched' %}selected{% endif %}>Matched</option>
-                <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Closed</option>
+                <option value="open" {% if request.GET.status == 'open' or not request.GET.status %}selected{% endif %}>Open ({{ status_counts.open|default:0 }})</option>
+                <option value="matched" {% if request.GET.status == 'matched' %}selected{% endif %}>Matched ({{ status_counts.matched|default:0 }})</option>
+                <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Closed ({{ status_counts.closed|default:0 }})</option>
             </select>
         </div>
         <div>
@@ -60,6 +63,7 @@
                     <p style="margin-bottom: 0.25rem;">📍 <strong>Location Lost:</strong> {{ item.location_lost }}</p>
                     <p style="margin-bottom: 0.25rem;">📅 <strong>Date Lost:</strong> {{ item.date_lost }}</p>
                     <p style="margin-top: 0.5rem; font-weight: 500; color: var(--text-secondary);">By: {{ item.reporter.username }}</p>
+                    <p style="margin-top: 0.25rem; color: var(--text-secondary); font-size: 0.85rem;">📧 {{ item.contact_email|default:'Not provided' }} | 📱 {{ item.contact_number|default:'Not provided' }}</p>
                     <a href="{% url 'lostfound:lost_detail' item.pk %}" class="btn btn-secondary" style="width: 100%; margin-top: 1rem; justify-content: center;">View Details</a>
                 </div>
             </div>
@@ -71,4 +75,16 @@
         <a href="{% url 'lostfound:lost_create' %}" class="btn btn-primary">Report a Lost Item Now</a>
     </div>
 {% endif %}
+<script>
+    // Auto-submit filters when user changes select values for a clearer UX
+    (function(){
+        try{
+            document.querySelectorAll('select[name="status"], select[name="my_reports"]').forEach(function(el){
+                el.addEventListener('change', function(){
+                    var form = el.closest('form'); if(form) form.submit();
+                });
+            });
+        }catch(e){ /* ignore for older browsers */ }
+    })();
+</script>
 {% endblock %}

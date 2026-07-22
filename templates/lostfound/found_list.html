@@ -16,7 +16,10 @@
         <h1>Found Items Registry</h1>
         <p style="color: var(--text-secondary);">Browse items found on campus or report a new one.</p>
     </div>
-    <a href="{% url 'lostfound:found_create' %}" class="btn btn-primary">➕ Report Found Item</a>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        <a href="{% url 'lostfound:found_create' %}" class="btn btn-primary">➕ Report Found Item</a>
+        <a href="{% url 'lostfound:lost_create' %}" class="btn btn-secondary">🧭 Report Lost Item</a>
+    </div>
 </div>
 
 <div class="card" style="padding: 1rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center;">
@@ -59,6 +62,7 @@
                     <p style="margin-bottom: 0.25rem;">📍 <strong>Location Found:</strong> {{ item.location_found }}</p>
                     <p style="margin-bottom: 0.25rem;">📅 <strong>Date Found:</strong> {{ item.date_found }}</p>
                     <p style="margin-top: 0.5rem; font-weight: 500; color: var(--text-secondary);">By: {{ item.finder.username }}</p>
+                    <p style="margin-top: 0.25rem; color: var(--text-secondary); font-size: 0.85rem;">📧 {{ item.contact_email|default:'Not provided' }} | 📱 {{ item.contact_number|default:'Not provided' }}</p>
                     <a href="{% url 'lostfound:found_detail' item.pk %}" class="btn btn-secondary" style="width: 100%; margin-top: 1rem; justify-content: center;">View Details</a>
                 </div>
             </div>

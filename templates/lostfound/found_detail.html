@@ -28,6 +28,8 @@
         <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem;">
             <p style="margin-bottom: 0.5rem;">📍 <strong>Location Found:</strong> {{ found_item.location_found }}</p>
             <p style="margin-bottom: 0.5rem;">📅 <strong>Date Found:</strong> {{ found_item.date_found }}</p>
+            <p style="margin-bottom: 0.5rem;">📧 <strong>Contact Email:</strong> {{ found_item.contact_email|default:'Not provided' }}</p>
+            <p style="margin-bottom: 0.5rem;">📱 <strong>Contact Number:</strong> {{ found_item.contact_number|default:'Not provided' }}</p>
             <p>👤 <strong>Found By:</strong> {{ found_item.finder.username }}</p>
         </div>
 

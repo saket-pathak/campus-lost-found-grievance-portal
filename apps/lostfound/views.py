@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
 from .models import LostItem, FoundItem, ClaimRequest
+from django.db.models import Count
 from .forms import LostItemForm, FoundItemForm, ClaimRequestForm
 from .matching import find_potential_matches
 
@@ -29,6 +30,13 @@ class LostItemListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(title__icontains=q) | queryset.filter(description__icontains=q)
             
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        counts = LostItem.objects.values('status').annotate(count=Count('id'))
+        status_counts = {c['status']: c['count'] for c in counts}
+        context['status_counts'] = status_counts
+        return context
 
 class LostItemDetailView(LoginRequiredMixin, DetailView):
     model = LostItem

@@ -29,6 +29,8 @@ class LostItem(TimeStampedModel):
     category = models.CharField(max_length=30, choices=CATEGORY_CHOICES)
     location_lost = models.CharField(max_length=200)
     date_lost = models.DateField()
+    contact_email = models.EmailField(blank=True, null=True)
+    contact_number = models.CharField(max_length=20, blank=True, null=True)
     image = models.ImageField(upload_to='lost_items/', blank=True, null=True)
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='open')
     
@@ -53,6 +55,8 @@ class FoundItem(TimeStampedModel):
     category = models.CharField(max_length=30, choices=CATEGORY_CHOICES)
     location_found = models.CharField(max_length=200)
     date_found = models.DateField()
+    contact_email = models.EmailField(blank=True, null=True)
+    contact_number = models.CharField(max_length=20, blank=True, null=True)
     image = models.ImageField(upload_to='found_items/', blank=True, null=True)
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='unclaimed')
     
