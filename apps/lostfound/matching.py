@@ -40,8 +40,10 @@ def find_potential_matches(lost_item):
         score = 0
         
         # 1. Category Match
+        category_match = False
         if found.category == lost_item.category:
             score += 50
+            category_match = True
             
         # 2. Title Word Overlap
         found_title_words = clean_text_to_words(found.title)
@@ -53,14 +55,18 @@ def find_potential_matches(lost_item):
         matching_desc_words = set(lost_desc_words).intersection(set(found_desc_words))
         score += len(matching_desc_words) * 5
         
-        # 4. Date Proximity
-        date_diff = abs((lost_item.date_lost - found.date_found).days)
-        if date_diff <= 1:
-            score += 30
-        elif date_diff <= 3:
-            score += 20
-        elif date_diff <= 7:
-            score += 10
+        # If there is no category match and no keyword match, it's not a match at all
+        if not category_match and not matching_title_words and not matching_desc_words:
+            score = 0
+        else:
+            # 4. Date Proximity
+            date_diff = abs((lost_item.date_lost - found.date_found).days)
+            if date_diff <= 1:
+                score += 30
+            elif date_diff <= 3:
+                score += 20
+            elif date_diff <= 7:
+                score += 10
             
         if score > 0:
             found.match_score = score

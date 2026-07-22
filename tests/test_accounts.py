@@ -33,6 +33,9 @@ def test_login_view(client):
     response = client.post(login_url, {'username': 'testuser', 'password': 'password123'})
     assert response.status_code == 302
     
+    # Logout before testing incorrect login
+    client.logout()
+    
     # POST login incorrect
     response = client.post(login_url, {'username': 'testuser', 'password': 'wrongpassword'})
     assert response.status_code == 200
