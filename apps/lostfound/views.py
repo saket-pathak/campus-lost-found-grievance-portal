@@ -186,3 +186,21 @@ class ClaimRequestActionView(LoginRequiredMixin, View):
             messages.info(request, "Claim request has been rejected.")
             
         return redirect('lostfound:found_detail', pk=claim.found_item.pk)
+
+
+class LostItemCloseView(LoginRequiredMixin, View):
+    def post(self, request, pk, *args, **kwargs):
+        lost_item = get_object_or_404(LostItem, pk=pk)
+        
+        is_authorized = (
+            request.user == lost_item.reporter or 
+            request.user.role in ('staff', 'admin') or 
+            request.user.is_superuser
+        )
+        if not is_authorized:
+            raise PermissionDenied("You are not authorized to close this report.")
+            
+        lost_item.status = 'closed'
+        lost_item.save()
+        messages.success(request, f"Lost item report for '{lost_item.title}' closed successfully.")
+        return redirect('lostfound:lost_detail', pk=lost_item.pk)

@@ -40,10 +40,18 @@
             </div>
         {% endif %}
         
-        {% if user == lost_item.reporter %}
-            <div style="display: flex; gap: 1rem;">
-                <a href="{% url 'lostfound:lost_update' lost_item.pk %}" class="btn btn-secondary">✏️ Edit Report</a>
-            </div>
+        {% if lost_item.status != 'closed' %}
+            {% if user == lost_item.reporter or user.role in 'staff,admin' or user.is_superuser %}
+                <div style="display: flex; gap: 1rem;">
+                    {% if user == lost_item.reporter %}
+                        <a href="{% url 'lostfound:lost_update' lost_item.pk %}" class="btn btn-secondary">✏️ Edit Report</a>
+                    {% endif %}
+                    <form action="{% url 'lostfound:lost_close' lost_item.pk %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">🔒 Close Report</button>
+                    </form>
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 

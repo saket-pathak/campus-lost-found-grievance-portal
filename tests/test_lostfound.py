@@ -92,3 +92,56 @@ def test_claim_flow():
     assert found.status == 'claimed'
     assert claim.status == 'approved'
     assert claim2.status == 'rejected'
+
+
+@pytest.mark.django_db
+def test_lost_item_close():
+    reporter = User.objects.create_user(username='reporter', password='p', role='student')
+    staff = User.objects.create_user(username='staff', password='p', role='staff')
+    other_user = User.objects.create_user(username='other_user', password='p', role='student')
+    
+    lost = LostItem.objects.create(
+        reporter=reporter,
+        title="Phone",
+        description="Lost a phone",
+        category="electronics",
+        location_lost="Main Building",
+        date_lost=date(2026, 7, 20),
+        status="open"
+    )
+    
+    from django.urls import reverse
+    from django.test import Client
+    client = Client()
+    close_url = reverse('lostfound:lost_close', kwargs={'pk': lost.pk})
+    
+    # 1. Unauthenticated user post fails
+    response = client.post(close_url)
+    assert response.status_code == 302 # Redirect to login
+    lost.refresh_from_db()
+    assert lost.status == 'open'
+    
+    # 2. Non-authorized user post gets 403 Forbidden
+    client.force_login(other_user)
+    response = client.post(close_url)
+    assert response.status_code == 403
+    lost.refresh_from_db()
+    assert lost.status == 'open'
+    
+    # 3. Reporter can close
+    client.force_login(reporter)
+    response = client.post(close_url)
+    assert response.status_code == 302 # Redirect to detail
+    lost.refresh_from_db()
+    assert lost.status == 'closed'
+    
+    # Reset status back to open
+    lost.status = 'open'
+    lost.save()
+    
+    # 4. Staff can close
+    client.force_login(staff)
+    response = client.post(close_url)
+    assert response.status_code == 302
+    lost.refresh_from_db()
+    assert lost.status == 'closed'

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     LostItemListView, LostItemDetailView, LostItemCreateView, LostItemUpdateView,
-    FoundItemListView, FoundItemDetailView, FoundItemCreateView,
+    LostItemCloseView, FoundItemListView, FoundItemDetailView, FoundItemCreateView,
     ClaimRequestCreateView, ClaimRequestActionView
 )
 
@@ -13,6 +13,7 @@ urlpatterns = [
     path('lost/new/', LostItemCreateView.as_view(), name='lost_create'),
     path('lost/<int:pk>/', LostItemDetailView.as_view(), name='lost_detail'),
     path('lost/<int:pk>/edit/', LostItemUpdateView.as_view(), name='lost_update'),
+    path('lost/<int:pk>/close/', LostItemCloseView.as_view(), name='lost_close'),
     
     # Found Items
     path('found/', FoundItemListView.as_view(), name='found_list'),
