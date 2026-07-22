@@ -22,6 +22,7 @@
     --text-primary: var(--parchment);
     --text-secondary: var(--parchment-muted);
     --text-muted: var(--text-faint);
+    --error: var(--rust);
     
     --primary: var(--brass);
     --primary-hover: #b59122; /* slightly darker brass for hover states if needed, but we keep it flat */

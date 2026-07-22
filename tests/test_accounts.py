@@ -40,3 +40,29 @@ def test_login_view(client):
     response = client.post(login_url, {'username': 'testuser', 'password': 'wrongpassword'})
     assert response.status_code == 200
     assert "correct username and password" in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_register_view(client):
+    register_url = reverse('accounts:register')
+    
+    # GET register page
+    response = client.get(register_url)
+    assert response.status_code == 200
+    
+    # POST register correct
+    data = {
+        'username': 'newuser',
+        'first_name': 'New',
+        'last_name': 'User',
+        'email': 'newuser@example.com',
+        'role': 'student',
+        'password1': 'SecurePass123!',
+        'password2': 'SecurePass123!',
+    }
+    response = client.post(register_url, data)
+    assert response.status_code == 302
+    assert '/accounts/register/success/' in response.url
+    
+    # Verify user exists in database
+    assert User.objects.filter(username='newuser').exists()

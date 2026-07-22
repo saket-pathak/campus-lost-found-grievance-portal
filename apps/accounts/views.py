@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import CreateView, UpdateView, TemplateView
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,13 +14,25 @@ class RegisterView(CreateView):
     model = User
     form_class = UserRegisterForm
     template_name = 'accounts/register.html'
-    success_url = reverse_lazy('core:home')
+    
+    def get_success_url(self):
+        return reverse('accounts:register_success') + f"?username={self.object.username}&email={self.object.email}&role={self.object.role}"
     
     def form_valid(self, form):
         response = super().form_valid(form)
         login(self.request, self.object)
         messages.success(self.request, f"Welcome to the Campus Portal, {self.object.username}!")
         return response
+
+class RegisterSuccessView(TemplateView):
+    template_name = 'accounts/register_success.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['username'] = self.request.GET.get('username', '')
+        context['email'] = self.request.GET.get('email', '')
+        context['role'] = self.request.GET.get('role', '')
+        return context
 
 class LoginView(BaseLoginView):
     template_name = 'accounts/login.html'
