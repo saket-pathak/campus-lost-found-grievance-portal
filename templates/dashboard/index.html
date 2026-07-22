@@ -1,0 +1,136 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 class="text-gradient">Staff Dashboard</h1>
+    <p style="color: var(--text-secondary);">Manage campus grievances, claim requests, and view analytics.</p>
+</div>
+
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 2rem;">
+    <div class="card" style="text-align: center;">
+        <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Open Grievances</h4>
+        <p style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">{{ grievance_stats.by_status.open }}</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Escalated Grievances</h4>
+        <p style="font-size: 2.5rem; font-weight: 800; color: var(--error);">{{ grievance_stats.by_status.escalated }}</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Avg Turnaround Time</h4>
+        <p style="font-size: 2.5rem; font-weight: 800; color: var(--success);">{{ grievance_stats.average_turnaround }}</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Unclaimed Found Items</h4>
+        <p style="font-size: 2.5rem; font-weight: 800; color: var(--warning);">{{ lostfound_stats.unclaimed_total }}</p>
+    </div>
+</div>
+
+<div class="grid" style="grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <div class="card">
+            <h3 style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>⚖️ Recent Grievances</span>
+                <a href="{% url 'grievance:grievance_list' %}" style="font-size: 0.85rem; color: var(--primary);">View All &rarr;</a>
+            </h3>
+            
+            {% if recent_grievances %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for grv in recent_grievances %}
+                        <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01);">
+                            <div>
+                                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem;">
+                                    <a href="{% url 'grievance:grievance_detail' grv.pk %}" style="color: var(--text-primary);">
+                                        #{{ grv.id }}: {{ grv.title }}
+                                    </a>
+                                </h4>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                                    By: {{ grv.submitter.username }} | Dept: {{ grv.category.department }}
+                                </p>
+                            </div>
+                            <span class="badge badge-{{ grv.status }}">{{ grv.status }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No grievances registered.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 1.25rem;">📝 Pending Claim Requests</h3>
+            
+            {% if pending_claims %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for claim in pending_claims %}
+                        <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01);">
+                            <div>
+                                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem;">
+                                    <a href="{% url 'lostfound:found_detail' claim.found_item.pk %}" style="color: var(--text-primary);">
+                                        Claim for: {{ claim.found_item.title }}
+                                    </a>
+                                </h4>
+                                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                                    Claimant: {{ claim.claimant.username }} | Found by: {{ claim.found_item.finder.username }}
+                                </p>
+                            </div>
+                            <a href="{% url 'lostfound:found_detail' claim.found_item.pk %}" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 1rem;">Review</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No pending claims.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <div class="card">
+            <h3 style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>🔍 Recent Lost Reports</span>
+                <a href="{% url 'lostfound:lost_list' %}" style="font-size: 0.85rem; color: var(--primary);">View All &rarr;</a>
+            </h3>
+            
+            {% if recent_lost %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for lost in recent_lost %}
+                        <div style="font-size: 0.9rem; padding: 0.75rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <a href="{% url 'lostfound:lost_detail' lost.pk %}" style="font-weight: 500;">{{ lost.title }}</a>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">By {{ lost.reporter.username }} on {{ lost.date_lost }}</p>
+                            </div>
+                            <span class="badge badge-{{ lost.status }}" style="font-size: 0.65rem;">{{ lost.status }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted); text-align: center;">No lost items reported.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>🎁 Recent Found Reports</span>
+                <a href="{% url 'lostfound:found_list' %}" style="font-size: 0.85rem; color: var(--primary);">View All &rarr;</a>
+            </h3>
+            
+            {% if recent_found %}
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for found in recent_found %}
+                        <div style="font-size: 0.9rem; padding: 0.75rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <a href="{% url 'lostfound:found_detail' found.pk %}" style="font-weight: 500;">{{ found.title }}</a>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">By {{ found.finder.username }} on {{ found.date_found }}</p>
+                            </div>
+                            <span class="badge badge-{{ found.status }}" style="font-size: 0.65rem;">{{ found.status }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--text-muted); text-align: center;">No found items reported.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
