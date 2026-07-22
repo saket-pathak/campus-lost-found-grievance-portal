@@ -2,10 +2,18 @@
 
 {% block title %}Grievances{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --module-accent: var(--sage);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <h1 class="text-gradient">Grievance Portal</h1>
+        <h1>Grievance Portal</h1>
         <p style="color: var(--text-secondary);">Submit and track academic or administrative grievances.</p>
     </div>
     {% if user.role == 'student' %}
@@ -46,10 +54,10 @@
             <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 250px;">
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
-                        <span class="badge badge-student" style="background-color: rgba(168, 85, 247, 0.15); color: var(--accent);">
+                        <span class="badge badge-category">
                             {{ grievance.category.name }}
                         </span>
-                        <span class="badge badge-{{ grievance.status }}">{{ grievance.get_status_display }}</span>
+                        <span class="stamp-badge module-grievance">{{ grievance.get_status_display|upper }}</span>
                     </div>
                     <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem;">{{ grievance.title }}</h3>
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">

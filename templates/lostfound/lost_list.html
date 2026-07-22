@@ -2,10 +2,18 @@
 
 {% block title %}Lost Items{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --module-accent: var(--rust);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <div>
-        <h1 class="text-gradient">Lost Items Registry</h1>
+        <h1>Lost Items Registry</h1>
         <p style="color: var(--text-secondary);">Browse lost item reports or create a new one.</p>
     </div>
     <a href="{% url 'lostfound:lost_create' %}" class="btn btn-primary">➕ Report Lost Item</a>
@@ -40,8 +48,8 @@
             <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 250px;">
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
-                        <span class="badge badge-student">Lost Item</span>
-                        <span class="badge badge-{{ item.status }}">{{ item.get_status_display }}</span>
+                        <span class="badge badge-category">Lost Item</span>
+                        <span class="stamp-badge module-lostfound">{{ item.get_status_display|upper }}</span>
                     </div>
                     <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem;">{{ item.title }}</h3>
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">

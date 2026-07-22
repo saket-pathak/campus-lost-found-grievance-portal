@@ -17,12 +17,12 @@
             
             <nav>
                 <ul class="nav-links">
-                    <li><a href="{% url 'core:home' %}" class="{% if request.resolver_match.view_name == 'core:home' %}active{% endif %}">Home</a></li>
+                    <li><a href="{% url 'core:home' %}" class="nav-home {% if request.resolver_match.view_name == 'core:home' %}active{% endif %}">Home</a></li>
                     {% if user.is_authenticated %}
-                        <li><a href="{% url 'lostfound:lost_list' %}" class="{% if 'lostfound' in request.path %}active{% endif %}">Lost & Found</a></li>
-                        <li><a href="{% url 'grievance:grievance_list' %}" class="{% if 'grievance' in request.path %}active{% endif %}">Grievance Portal</a></li>
+                        <li><a href="{% url 'lostfound:lost_list' %}" class="nav-lostfound {% if 'lostfound' in request.path %}active{% endif %}">Lost & Found</a></li>
+                        <li><a href="{% url 'grievance:grievance_list' %}" class="nav-grievance {% if 'grievance' in request.path %}active{% endif %}">Grievance Portal</a></li>
                         {% if user.role in 'staff,admin' or user.is_superuser %}
-                            <li><a href="{% url 'dashboard:index' %}" class="{% if 'dashboard' in request.path %}active{% endif %}">Dashboard</a></li>
+                            <li><a href="{% url 'dashboard:index' %}" class="nav-dashboard {% if 'dashboard' in request.path %}active{% endif %}">Dashboard</a></li>
                         {% endif %}
                     {% endif %}
                 </ul>

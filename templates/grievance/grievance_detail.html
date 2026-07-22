@@ -2,6 +2,14 @@
 
 {% block title %}Grievance Details - #{{ grievance.id }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --module-accent: var(--sage);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="margin-bottom: 2rem;">
     <a href="{% url 'grievance:grievance_list' %}" style="color: var(--text-secondary); font-weight: 500;">&larr; Back to Grievances</a>
@@ -11,11 +19,11 @@
     <div style="display: flex; flex-direction: column; gap: 2rem;">
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <span class="badge badge-staff">{{ grievance.category.name }} ({{ grievance.category.department }})</span>
-                <span class="badge badge-{{ grievance.status }}">{{ grievance.get_status_display }}</span>
+                <span class="badge badge-category">{{ grievance.category.name }} ({{ grievance.category.department }})</span>
+                <span class="stamp-badge module-grievance">{{ grievance.get_status_display|upper }}</span>
             </div>
             
-            <h2 style="font-size: 2rem; margin-bottom: 1rem;">{{ grievance.title }}</h2>
+            <h2 style="font-family: var(--font-display); font-weight: 700; font-size: 2rem; margin-bottom: 1rem;"><span class="ref-number" style="font-family: var(--font-mono); font-weight: 500; font-size: 1.75rem; color: var(--parchment-muted);">#{{ grievance.id }}</span>: {{ grievance.title }}</h2>
             <p style="color: var(--text-secondary); white-space: pre-line; margin-bottom: 1.5rem;">{{ grievance.description }}</p>
             
             <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
@@ -40,11 +48,11 @@
                         <div style="position: relative;">
                             <div style="position: absolute; left: -29px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background-color: var(--primary); border: 2px solid var(--bg-card);"></div>
                             <p style="font-size: 0.85rem; color: var(--text-muted);">{{ log.timestamp|date:"M d, Y H:i" }}</p>
-                            <p style="font-weight: 600; margin: 0.25rem 0;">
+                            <p style="font-weight: 500; margin: 0.25rem 0;">
                                 Status changed from 
-                                <span class="badge badge-{{ log.old_status }}" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">{{ log.old_status }}</span> 
+                                <span class="stamp-badge module-grievance" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; transform: none;">{{ log.old_status|upper }}</span> 
                                 to 
-                                <span class="badge badge-{{ log.new_status }}" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">{{ log.new_status }}</span>
+                                <span class="stamp-badge module-grievance" style="font-size: 0.65rem; padding: 0.15rem 0.4rem; transform: none;">{{ log.new_status|upper }}</span>
                                 by {{ log.changed_by.username }}
                             </p>
                             {% if log.note %}
@@ -64,7 +72,7 @@
     <div style="display: flex; flex-direction: column; gap: 2rem;">
         {% if user.role in 'staff,admin' or user.is_superuser %}
             <div class="card">
-                <h3 class="text-gradient" style="margin-bottom: 1rem;">Assign Handler</h3>
+                <h3 style="margin-bottom: 1rem;">Assign Handler</h3>
                 <form action="{% url 'grievance:grievance_assign' grievance.pk %}" method="post">
                     {% csrf_token %}
                     <div class="form-group">
@@ -77,7 +85,7 @@
 
         {% if status_form %}
             <div class="card">
-                <h3 class="text-gradient" style="margin-bottom: 1rem;">Update Status</h3>
+                <h3 style="margin-bottom: 1rem;">Update Status</h3>
                 <form action="{% url 'grievance:grievance_transition' grievance.pk %}" method="post">
                     {% csrf_token %}
                     

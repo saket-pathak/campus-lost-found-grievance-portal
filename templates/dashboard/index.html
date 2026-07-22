@@ -4,26 +4,34 @@
 
 {% block content %}
 <div style="margin-bottom: 2rem;">
-    <h1 class="text-gradient">Staff Dashboard</h1>
+    <h1>Staff Dashboard</h1>
     <p style="color: var(--text-secondary);">Manage campus grievances, claim requests, and view analytics.</p>
 </div>
 
 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 2rem;">
-    <div class="card" style="text-align: center;">
+    <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Open Grievances</h4>
-        <p style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">{{ grievance_stats.by_status.open }}</p>
+        <div style="margin-top: 0.5rem;">
+            <span class="stamp-badge module-grievance" style="font-size: 1.5rem; padding: 4px 14px;">{{ grievance_stats.by_status.open }}</span>
+        </div>
     </div>
-    <div class="card" style="text-align: center;">
+    <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Escalated Grievances</h4>
-        <p style="font-size: 2.5rem; font-weight: 800; color: var(--error);">{{ grievance_stats.by_status.escalated }}</p>
+        <div style="margin-top: 0.5rem;">
+            <span class="stamp-badge module-grievance" style="font-size: 1.5rem; padding: 4px 14px;">{{ grievance_stats.by_status.escalated }}</span>
+        </div>
     </div>
-    <div class="card" style="text-align: center;">
+    <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Avg Turnaround Time</h4>
-        <p style="font-size: 2.5rem; font-weight: 800; color: var(--success);">{{ grievance_stats.average_turnaround }}</p>
+        <div style="margin-top: 0.5rem;">
+            <span class="stamp-badge module-grievance" style="font-size: 1.5rem; padding: 4px 14px;">{{ grievance_stats.average_turnaround }}</span>
+        </div>
     </div>
-    <div class="card" style="text-align: center;">
+    <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <h4 style="color: var(--text-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Unclaimed Found Items</h4>
-        <p style="font-size: 2.5rem; font-weight: 800; color: var(--warning);">{{ lostfound_stats.unclaimed_total }}</p>
+        <div style="margin-top: 0.5rem;">
+            <span class="stamp-badge module-lostfound" style="font-size: 1.5rem; padding: 4px 14px;">{{ lostfound_stats.unclaimed_total }}</span>
+        </div>
     </div>
 </div>
 
@@ -42,14 +50,14 @@
                             <div>
                                 <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem;">
                                     <a href="{% url 'grievance:grievance_detail' grv.pk %}" style="color: var(--text-primary);">
-                                        #{{ grv.id }}: {{ grv.title }}
+                                        <span class="ref-number">#{{ grv.id }}</span>: {{ grv.title }}
                                     </a>
                                 </h4>
                                 <p style="font-size: 0.8rem; color: var(--text-muted);">
                                     By: {{ grv.submitter.username }} | Dept: {{ grv.category.department }}
                                 </p>
                             </div>
-                            <span class="badge badge-{{ grv.status }}">{{ grv.status }}</span>
+                            <span class="stamp-badge module-grievance">{{ grv.status|upper }}</span>
                         </div>
                     {% endfor %}
                 </div>
@@ -100,7 +108,7 @@
                                 <a href="{% url 'lostfound:lost_detail' lost.pk %}" style="font-weight: 500;">{{ lost.title }}</a>
                                 <p style="font-size: 0.75rem; color: var(--text-muted);">By {{ lost.reporter.username }} on {{ lost.date_lost }}</p>
                             </div>
-                            <span class="badge badge-{{ lost.status }}" style="font-size: 0.65rem;">{{ lost.status }}</span>
+                            <span class="stamp-badge module-lostfound" style="font-size: 0.65rem; padding: 2px 6px;">{{ lost.status|upper }}</span>
                         </div>
                     {% endfor %}
                 </div>
@@ -123,7 +131,7 @@
                                 <a href="{% url 'lostfound:found_detail' found.pk %}" style="font-weight: 500;">{{ found.title }}</a>
                                 <p style="font-size: 0.75rem; color: var(--text-muted);">By {{ found.finder.username }} on {{ found.date_found }}</p>
                             </div>
-                            <span class="badge badge-{{ found.status }}" style="font-size: 0.65rem;">{{ found.status }}</span>
+                            <span class="stamp-badge module-lostfound" style="font-size: 0.65rem; padding: 2px 6px;">{{ found.status|upper }}</span>
                         </div>
                     {% endfor %}
                 </div>
