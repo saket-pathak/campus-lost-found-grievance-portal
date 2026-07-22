@@ -16,7 +16,8 @@ class User(AbstractUser):
     objects = UserManager()
     
     def __str__(self):
-        return f"{self.username} ({self.get_role_display()})"
+        role_label = dict(self.ROLE_CHOICES).get(self.role, self.role)
+        return f"{self.username} ({role_label})"
     
     @property
     def is_student(self):

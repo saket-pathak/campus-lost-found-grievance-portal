@@ -291,6 +291,41 @@ h3 { font-size: 1.25rem; }
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
+/* Improve select / dropdown visibility (native and Select2 overrides) */
+select, select option, select optgroup {
+    color: var(--text-primary);
+}
+
+/* Native select: keep input background but ensure high contrast text */
+select {
+    background-color: rgba(255, 255, 255, 0.03);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Select2 dropdown overrides for better contrast */
+.select2-container--default .select2-selection__rendered {
+    color: var(--text-primary);
+}
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: var(--text-secondary);
+}
+.select2-container--default .select2-results > .select2-results__options {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+.select2-container--default .select2-results__option {
+    color: var(--text-primary);
+    padding: 0.6rem 0.8rem;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected],
+.select2-container--default .select2-results__option--highlighted {
+    background-color: rgba(99, 102, 241, 0.18);
+    color: var(--text-primary);
+}
+
+
 /* Notifications Bell Badge */
 .notifications-indicator {
     position: relative;
